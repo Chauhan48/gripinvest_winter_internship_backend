@@ -12,11 +12,14 @@ userController.signup = async (request, response) => {
             return response.status(409).json({ message: CONSTANTS.RESPONSE_MESSAGES.EMAIL_ALREADY_EXISTS });
         }
         const hashPassword = await common.hashPassword(password_hash);
+        const { v4: uuidv4 } = await import('uuid');
+        const userId = uuidv4();
 
         const query = `
         INSERT INTO users (id, first_name, last_name, email, password_hash, risk_appetite)
-        VALUES (UUID(), ?, ?, ?, ?, ?)`;
+        VALUES (?, ?, ?, ?, ?, ?)`;
         const params = [
+            userId,
             first_name,
             last_name || null,
             email,
@@ -25,7 +28,7 @@ userController.signup = async (request, response) => {
         ];
         await dbServices.addRow(query, params);
 
-        const token = common.generateToken({ userEmail: email });
+        const token = common.generateToken({ userId: userId });
         response.cookie('auth_token', token, {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000
@@ -49,7 +52,7 @@ userController.login = async (request, response) => {
         if(!password){
             throw new Error(CONSTANTS.RESPONSE_MESSAGES.INVALID_CREDENTIALS);
         }
-        const token = common.generateToken({ userEmail: email });
+        const token = common.generateToken({ userId: rows[0].id });
         response.cookie('auth_token', token, {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000
