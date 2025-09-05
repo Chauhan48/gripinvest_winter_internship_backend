@@ -1,0 +1,30 @@
+{
+  "name": "grip_invest_backend",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/Chauhan48/gripinvest_winter_internship_backend#readme",
+  "bugs": {
+    "url": "https://github.com/Chauhan48/gripinvest_winter_internship_backend/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chauhan48/gripinvest_winter_internship_backend.git"
+  },
+  "license": "ISC",
+  "author": "Anshit Chauhan",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.4"
+  }
+}
