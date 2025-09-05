@@ -5,5 +5,6 @@ const joiSchema = require('../utils/joiSchema');
 
 
 userRoutes.post('/signup', schemaValidation(joiSchema.registrationSchema), userController.signup);
+userRoutes.post('/login', schemaValidation(joiSchema.loginSchema), userController.login);
 
 module.exports = userRoutes;
