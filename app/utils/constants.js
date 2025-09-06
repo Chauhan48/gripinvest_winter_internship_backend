@@ -8,6 +8,8 @@ const CONSTANTS = {
         INVALID_EMAIL: 'Invalid email',
         FORGOT_PASSWORD_SUCCESS: 'OTP is send to you email',
         ERROR: 'An unexpected error occured. Please try again later',
+        UNAUTHORIZED: 'Unauthorized',
+        PASSWORD_RESET_SUCCESS: 'Password reset successfully',
     }
 };
 

@@ -70,38 +70,54 @@ userController.login = async (request, response) => {
         });
         return response.status(200).json({ message: CONSTANTS.RESPONSE_MESSAGES.LOGIN_SUCCESS });
 
+    } catch {
+        return response.status(401).json({ message: CONSTANTS.RESPONSE_MESSAGES.INVALID_CREDENTIALS })
+    }
+}
+
+userController.forgotPassword = async (request, response) => {
+    try {
+        const { email } = request.body;
+        const rows = await dbServices.find('SELECT * FROM users WHERE email = ?', [email]);
+        if (rows.length == 0) {
+            throw new Error(CONSTANTS.RESPONSE_MESSAGES.INVALID_EMAIL);
+        }
+
+        const resetToken = common.generateShortToken({ userId: rows[0].id });
+
+        const otp = common.generateOTP();
+        const htmlContent = await common.resetPasswordTemplate(rows[0].first_name, otp);
+
+        await sendEmail({
+            to: email,
+            subject: 'Password Reset OTP',
+            html: htmlContent
+        })
+
+        return response.status(200).json({
+            message: CONSTANTS.RESPONSE_MESSAGES.FORGOT_PASSWORD_SUCCESS,
+            token: resetToken
+        })
     } catch (err) {
         console.log(err);
         return response.status(401).json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR })
     }
 }
 
-userController.forgotPassword = async (request, response) => {
+userController.verifyPassword = async (request, response) => {
     try{
-        const { email } = request.body;
-        const rows = await dbServices.find('SELECT * FROM users WHERE email = ?', [email]);
-        if (rows.length == 0) {
-            throw new Error(CONSTANTS.RESPONSE_MESSAGES.INVALID_EMAIL);
-        }
-    
-        const resetToken = common.generateShortToken({ userId: rows[0].id });
-    
-        const otp = common.generateOTP();
-        const htmlContent = await common.resetPasswordTemplate(rows[0].first_name, otp);
-    
-        await sendEmail({
-            to: email,
-            subject: 'Password Reset OTP',
-            html: htmlContent
-        })
-    
-        return response.status(200).json({ message: CONSTANTS.RESPONSE_MESSAGES.FORGOT_PASSWORD_SUCCESS,
-            token: resetToken
-         })
-    } catch (err) {
+        const { password_hash } = request.body;
+        const user = request.user;
+        const hashedPassword = await common.hashPassword(password_hash);
+        const query = 'UPDATE users SET password_hash = ? WHERE email = ?';
+        const params = [hashedPassword, user.email];
+        await dbServices.addRow(query, params);
+        return response.status(200).json({ message: CONSTANTS.RESPONSE_MESSAGES.PASSWORD_RESET_SUCCESS });
+    }catch(err){
         console.log(err);
         return response.status(401).json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR })
     }
+
 }
 
 module.exports = userController;

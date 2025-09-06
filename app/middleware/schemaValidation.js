@@ -19,6 +19,9 @@ exports.schemaValidation = (schema) => {
             if (schema.query) {
                 checkValidations(schema.query, req.query);
             }
+            if (schema.headers) {
+                checkValidations(schema.headers, req.headers);
+            }
             next();
         } catch (error) {
             console.log(error);

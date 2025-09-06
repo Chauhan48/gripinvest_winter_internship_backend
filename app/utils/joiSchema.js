@@ -25,4 +25,11 @@ joiSchema.forstoPasswordSchema = {
     })
 }
 
+joiSchema.verifyPasswordSchema = {
+    body: joi.object({
+        otp: joi.number().min(6).required(),
+        password_hash: joi.string().min(6).required()
+    })
+}
+
 module.exports = joiSchema;
