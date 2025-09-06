@@ -12,5 +12,6 @@ module.exports = {
     ADMIN_FIRST_NAME: process.env.ADMIN_FIRST_NAME || 'admin',
     ADMIN_LAST_NAME: process.env.ADMIN_LAST_NAME || '',
     ADMIN_EMAIL: process.env.ADMIN_EMAIL || '',
-    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || '' 
+    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || '',
+    API_KEY: process.env.GOOGLE_API_KEY || ''
 };

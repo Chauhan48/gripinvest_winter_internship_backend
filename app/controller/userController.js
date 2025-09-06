@@ -8,7 +8,7 @@ const userController = {};
 userController.signup = async (request, response) => {
     try {
         const { first_name, last_name, email, password_hash } = request.body;
-        const rows = await dbServices.find('SELECT * FROM users WHERE email = ?', [email]);
+        const rows = await dbServices.execute('SELECT * FROM users WHERE email = ?', [email]);
         if (rows.length > 0) {
             return response.status(409).json({ message: CONSTANTS.RESPONSE_MESSAGES.EMAIL_ALREADY_EXISTS });
         }
@@ -37,7 +37,7 @@ userController.signup = async (request, response) => {
             hashPassword,
             'moderate',
         ];
-        await dbServices.addRow(query, params);
+        await dbServices.execute(query, params);
 
         const token = common.generateToken({ userId: userId });
         response.cookie('auth_token', token, {
@@ -55,7 +55,7 @@ userController.signup = async (request, response) => {
 userController.login = async (request, response) => {
     try {
         const { email, password_hash } = request.body;
-        const rows = await dbServices.find('SELECT * FROM users WHERE email = ?', [email]);
+        const rows = await dbServices.execute('SELECT * FROM users WHERE email = ?', [email]);
         if (rows.length == 0) {
             throw new Error(CONSTANTS.RESPONSE_MESSAGES.INVALID_CREDENTIALS);
         }
@@ -78,7 +78,7 @@ userController.login = async (request, response) => {
 userController.forgotPassword = async (request, response) => {
     try {
         const { email } = request.body;
-        const rows = await dbServices.find('SELECT * FROM users WHERE email = ?', [email]);
+        const rows = await dbServices.execute('SELECT * FROM users WHERE email = ?', [email]);
         if (rows.length == 0) {
             throw new Error(CONSTANTS.RESPONSE_MESSAGES.INVALID_EMAIL);
         }
@@ -95,7 +95,7 @@ userController.forgotPassword = async (request, response) => {
             hashOtp,
             expiresDate
         ];
-        await dbServices.addRow(query, params);
+        await dbServices.execute(query, params);
 
         const htmlContent = await common.resetPasswordTemplate(rows[0].first_name, otp);
 
@@ -120,7 +120,7 @@ userController.verifyPassword = async (request, response) => {
         const { otp, password_hash } = request.body;
         const user = request.user;
         // check for otp;
-        const rows = await dbServices.find('SELECT * FROM otp_codes WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
+        const rows = await dbServices.execute('SELECT * FROM otp_codes WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
             [user.id]
         );
 
@@ -147,7 +147,7 @@ userController.verifyPassword = async (request, response) => {
         const hashedPassword = await common.hashPassword(password_hash);
         const query = 'UPDATE users SET password_hash = ? WHERE email = ?';
         const params = [hashedPassword, user.email];
-        await dbServices.addRow(query, params);
+        await dbServices.execute(query, params);
         return response.status(200).json({ message: CONSTANTS.RESPONSE_MESSAGES.PASSWORD_RESET_SUCCESS });
     }catch(err){
         console.log(err);

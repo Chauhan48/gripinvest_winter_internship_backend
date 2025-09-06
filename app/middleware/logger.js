@@ -14,7 +14,7 @@ const logger = async (request, response, next) => {
         if (request.cookies && request.cookies.auth_token) {
           const decode = common.decryptToken(request.cookies.auth_token);
           userId = decode.userId;
-          const rows = await dbServices.find('SELECT email FROM users WHERE id = ?', [userId]);
+          const rows = await dbServices.execute('SELECT email FROM users WHERE id = ?', [userId]);
           if (rows && rows.length > 0) {
             userEmail = rows[0].email;
           }
@@ -24,7 +24,7 @@ const logger = async (request, response, next) => {
         userEmail = request.user.email;
       }
 
-      await dbServices.addRow(
+      await dbServices.execute(
         `INSERT INTO transaction_logs (user_id, email, endpoint, http_method, status_code, error_message)
          VALUES (?, ?, ?, ?, ?, ?)`,
         [userId, userEmail, endpoint, http_method, status_code, error_message]

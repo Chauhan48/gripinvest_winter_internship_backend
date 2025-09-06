@@ -7,7 +7,7 @@ const authMiddleware = async (request, response, next) => {
         const token = request.cookies.auth_token || request.headers.authorization;
         const decoded = common.decryptToken(token);
         if(decoded && decoded.userId){
-            const rows = await dbServices.find('SELECT * FROM users WHERE id = ?', [decoded.userId]);
+            const rows = await dbServices.execute('SELECT * FROM users WHERE id = ?', [decoded.userId]);
             request.user = rows[0];
         }
         next();
