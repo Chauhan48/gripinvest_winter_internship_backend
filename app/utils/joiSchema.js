@@ -19,7 +19,7 @@ joiSchema.loginSchema = {
     })
 }
 
-joiSchema.forstoPasswordSchema = {
+joiSchema.forgotPasswordSchema = {
     body: joi.object({
         email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required(),
     })
@@ -67,6 +67,13 @@ joiSchema.updateProductSchema = {
             }),
         description: joi.string().required(),
         productId: joi.string().required(),
+    })
+}
+
+joiSchema.productListingSchema = {
+    query: joi.object({
+        page: joi.number().required(),
+        limit: joi.number().required()
     })
 }
 

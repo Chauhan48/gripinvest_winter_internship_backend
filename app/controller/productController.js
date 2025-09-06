@@ -6,73 +6,73 @@ const productController = {};
 
 productController.addProduct = async (request, response) => {
 
-    try{
-        const {name, investment_type, tenure_months, annual_yield, risk_level, min_investment, max_investment} = request.body
-    
+    try {
+        const { name, investment_type, tenure_months, annual_yield, risk_level, min_investment, max_investment } = request.body
+
         const productDescription = await aiServices.generateProductDescription({
-            name, 
-            investment_type, 
-            tenure_months, 
-            annual_yield, 
-            risk_level, 
-            min_investment, 
+            name,
+            investment_type,
+            tenure_months,
+            annual_yield,
+            risk_level,
+            min_investment,
             max_investment
         });
-    
+
         const query = `
                 INSERT INTO investment_products (name, investment_type, tenure_months, annual_yield, risk_level, min_investment, max_investment, description)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
         const params = [
-            name, 
-            investment_type, 
-            tenure_months, 
-            annual_yield, 
-            risk_level, 
-            min_investment, 
-            max_investment, 
+            name,
+            investment_type,
+            tenure_months,
+            annual_yield,
+            risk_level,
+            min_investment,
+            max_investment,
             productDescription
         ];
         await dbServices.execute(query, params);
         return response.status(200).json({ message: CONSTANTS.RESPONSE_MESSAGES.PRODUCT_ADD_SUCCESS });
-    }catch(err){
+    } catch (err) {
         console.log(err);
         return response.status(401).json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR });
     }
 }
 
 productController.removeProduct = async (request, response) => {
-    try{
+    try {
         const { productId } = request.body;
         const query = `
                 DELETE from investment_products WHERE id = ?`;
         const params = [productId];
         await dbServices.execute(query, params);
         return response.status(200).json({ message: CONSTANTS.RESPONSE_MESSAGES.PRODUCT_DELETE_SUCCESS })
-    }catch(err){
+    } catch (err) {
         console.log(err);
         return response.status(401).json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR });
     }
 }
 
 productController.updateProduct = async (request, response) => {
-  try {
-    const {
-      productId,
-      name,
-      investment_type,
-      tenure_months,
-      annual_yield,
-      risk_level,
-      min_investment,
-      max_investment,
-      description
-    } = request.body;
+    try {
+        const {
+            productId,
+            name,
+            investment_type,
+            tenure_months,
+            annual_yield,
+            risk_level,
+            min_investment,
+            max_investment,
+            description
+        } = request.body;
 
-    if (!productId) {
-      return response.status(400).json({ message: "Product ID is required" });
-    }
+        if (!productId) {
+            return response.status(400).json({ message: "Product ID is required" });
+        }
 
-    const query = `
+        const query = `
       UPDATE investment_products 
       SET 
         name = ?, 
@@ -86,33 +86,69 @@ productController.updateProduct = async (request, response) => {
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?`;
 
-    const params = [
-      name,
-      investment_type,
-      tenure_months,
-      annual_yield,
-      risk_level,
-      min_investment,
-      max_investment,
-      description,
-      productId
-    ];
+        const params = [
+            name,
+            investment_type,
+            tenure_months,
+            annual_yield,
+            risk_level,
+            min_investment,
+            max_investment,
+            description,
+            productId
+        ];
 
-    const result = await dbServices.execute(query, params);
+        const result = await dbServices.execute(query, params);
 
-    if (result.affectedRows === 0) {
-      return response.status(404).json({ message: "Product not found" });
+        if (result.affectedRows === 0) {
+            return response.status(404).json({ message: "Product not found" });
+        }
+
+        return response
+            .status(200)
+            .json({ message: CONSTANTS.RESPONSE_MESSAGES.PRODUCT_UPDATE_SUCCESS });
+    } catch (err) {
+        console.error("Error updating product:", err);
+        return response
+            .status(500)
+            .json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR });
     }
+};
 
-    return response
-      .status(200)
-      .json({ message: CONSTANTS.RESPONSE_MESSAGES.PRODUCT_UPDATE_SUCCESS });
+productController.productListing = async (request, response) => {
+  try {
+    const page = parseInt(request.query.page, 10) || 1;
+    const limit = parseInt(request.query.limit, 10) || 10;
+    const offset = (page - 1) * limit;
+
+    const countQuery = `SELECT COUNT(*) as total FROM investment_products`;
+    const [countResult] = await dbServices.execute(countQuery);
+    const total = countResult.total;
+    const totalPages = Math.ceil(total / limit);
+
+    const query = `
+      SELECT id, name, investment_type, tenure_months, annual_yield, risk_level,
+             min_investment, max_investment, description, created_at, updated_at
+      FROM investment_products
+      ORDER BY created_at DESC
+      LIMIT ? OFFSET ?`;
+
+    const products = await dbServices.execute(query, [limit, offset]);
+
+    return response.status(200).json({
+      page,
+      limit,
+      total,
+      totalPages,
+      data: products,
+    });
   } catch (err) {
-    console.error("Error updating product:", err);
+    console.error("Error fetching products:", err);
     return response
       .status(500)
       .json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR });
   }
 };
+
 
 module.exports = productController;
