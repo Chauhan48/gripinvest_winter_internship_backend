@@ -4,7 +4,8 @@ const { PORT } = require('./config/config');
 const startNodeServer = async () => {
   try {
     await require('./app/migrations/initMigrations')();
-    const pool = await require('./app/startup/databaseConnection');
+    await require('./app/migrations/defaultAdminMigration')();
+    await require('./app/startup/databaseConnection');
     console.log('Connected to database successfully');
   } catch (err) {
     console.log('Error connecting to database', err);

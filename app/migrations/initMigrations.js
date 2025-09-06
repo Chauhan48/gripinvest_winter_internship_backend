@@ -19,6 +19,7 @@ const initMigrations = async () => {
       last_name VARCHAR(100),
       email VARCHAR(255) UNIQUE NOT NULL,
       password_hash VARCHAR(255) NOT NULL,
+      role ENUM('user', 'admin') DEFAULT 'user',
       risk_appetite ENUM('low','moderate','high') DEFAULT 'moderate',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
