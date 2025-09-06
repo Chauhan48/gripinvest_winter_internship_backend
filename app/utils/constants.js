@@ -13,7 +13,8 @@ const CONSTANTS = {
         INVALID_OTP: 'Invalid OTP',
         OTP_EXPIRED: 'Otp has expired. Kindly generate a new OTP',
         PRODUCT_ADD_SUCCESS: 'New product added successfully',
-        PRODUCT_DELETE_SUCCESS: 'Product deleted successfully'
+        PRODUCT_DELETE_SUCCESS: 'Product deleted successfully',
+        PRODUCT_UPDATE_SUCCESS: 'Product details updated successfully',
     }
 };
 

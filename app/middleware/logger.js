@@ -29,6 +29,10 @@ const logger = async (request, response, next) => {
          VALUES (?, ?, ?, ?, ?, ?)`,
         [userId, userEmail, endpoint, http_method, status_code, error_message]
       );
+      console.log(
+        `[LOG] userId=${userId} | email=${userEmail} | endpoint=${request.originalUrl} | method=${request.method} | status=${response.statusCode}`
+      );
+
     } catch (err) {
       console.error('Logger error:', err);
     }

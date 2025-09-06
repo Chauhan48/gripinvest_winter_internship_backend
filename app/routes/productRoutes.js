@@ -8,5 +8,6 @@ const joiSchema = require('../utils/joiSchema');
 
 productRoutes.post('/add-product', authMiddleware, checkForAdmin, schemaValidation(joiSchema.addProductSchema), productController.addProduct);
 productRoutes.post('/delete-product', authMiddleware, checkForAdmin, schemaValidation(joiSchema.deleteProductSchema), productController.removeProduct);
+productRoutes.post('/update-product', authMiddleware, checkForAdmin, schemaValidation(joiSchema.updateProductSchema), productController.updateProduct);
 
 module.exports = productRoutes;

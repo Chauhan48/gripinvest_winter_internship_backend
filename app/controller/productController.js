@@ -42,9 +42,7 @@ productController.addProduct = async (request, response) => {
 
 productController.removeProduct = async (request, response) => {
     try{
-        console.log(request.user)
         const { productId } = request.body;
-        console.log(productId);
         const query = `
                 DELETE from investment_products WHERE id = ?`;
         const params = [productId];
@@ -56,5 +54,65 @@ productController.removeProduct = async (request, response) => {
     }
 }
 
+productController.updateProduct = async (request, response) => {
+  try {
+    const {
+      productId,
+      name,
+      investment_type,
+      tenure_months,
+      annual_yield,
+      risk_level,
+      min_investment,
+      max_investment,
+      description
+    } = request.body;
+
+    if (!productId) {
+      return response.status(400).json({ message: "Product ID is required" });
+    }
+
+    const query = `
+      UPDATE investment_products 
+      SET 
+        name = ?, 
+        investment_type = ?, 
+        tenure_months = ?, 
+        annual_yield = ?, 
+        risk_level = ?, 
+        min_investment = ?, 
+        max_investment = ?, 
+        description = ?,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?`;
+
+    const params = [
+      name,
+      investment_type,
+      tenure_months,
+      annual_yield,
+      risk_level,
+      min_investment,
+      max_investment,
+      description,
+      productId
+    ];
+
+    const result = await dbServices.execute(query, params);
+
+    if (result.affectedRows === 0) {
+      return response.status(404).json({ message: "Product not found" });
+    }
+
+    return response
+      .status(200)
+      .json({ message: CONSTANTS.RESPONSE_MESSAGES.PRODUCT_UPDATE_SUCCESS });
+  } catch (err) {
+    console.error("Error updating product:", err);
+    return response
+      .status(500)
+      .json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR });
+  }
+};
 
 module.exports = productController;
