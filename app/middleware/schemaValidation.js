@@ -21,7 +21,8 @@ exports.schemaValidation = (schema) => {
             }
             next();
         } catch (error) {
-            return res.status(400).json(error.message)
+            console.log(error);
+            return res.status(400).json({message: 'Empty fields are not allowed'})
         }
     }
 }

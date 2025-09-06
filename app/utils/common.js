@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const zxcvbn = require('zxcvbn');
+const path = require('path');
+const fs = require('fs/promises');
 const config = require('../../config/config');
 
 const common = {};
@@ -20,6 +22,11 @@ common.generateToken = (payload) => {
   return jwt.sign(payload, config.TOKEN_SECRET, { expiresIn: '24h' });
 };
 
+// generate short JWT token
+common.generateShortToken = (payload) => {
+  return jwt.sign(payload, config.TOKEN_SECRET, { expiresIn: '10m' }); 
+}
+
 // decrypt JWT token
 common.decryptToken = (token) => {
   try {
@@ -33,6 +40,20 @@ common.decryptToken = (token) => {
 common.checkPasswordStrength = async (password) => {
   const result = zxcvbn(password);
   return result;
+}
+
+common.resetPasswordTemplate = async (first_name, otp) => {
+  const templatePath = path.join(__dirname, '../../public', 'resetPasswordTemplate.html');
+  let template = await fs.readFile(templatePath, 'utf-8');
+
+  template = template.replace('{{FIRST_NAME}}', first_name);
+  template = template.replace('{{OTP_CODE}}', otp);
+
+  return template;
+}
+
+common.generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000);
 }
 
 module.exports = common;
