@@ -11,6 +11,16 @@ userController.signup = async (request, response) => {
         if (rows.length > 0) {
             return response.status(409).json({ message: CONSTANTS.RESPONSE_MESSAGES.EMAIL_ALREADY_EXISTS });
         }
+
+        const passwordStrenght = await common.checkPasswordStrength(password_hash);
+        if(passwordStrenght.score < 3){
+            return response.status(400).json({
+                message: CONSTANTS.RESPONSE_MESSAGES.WEAK_PASSWORD,
+                suggestion: passwordStrenght.feedback.suggestions,
+                warning: passwordStrenght.feedback.warning
+            })
+        }
+
         const hashPassword = await common.hashPassword(password_hash);
         const { v4: uuidv4 } = await import('uuid');
         const userId = uuidv4();
@@ -62,6 +72,10 @@ userController.login = async (request, response) => {
     }catch(err){
         return response.status(401).json({ message: err.message })
     }
+}
+
+userController.forgotPassword = async (request, response) => {
+    
 }
 
 module.exports = userController;

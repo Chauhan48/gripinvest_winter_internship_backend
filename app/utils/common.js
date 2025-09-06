@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const zxcvbn = require('zxcvbn');
 const config = require('../../config/config');
 
 const common = {};
@@ -27,5 +28,11 @@ common.decryptToken = (token) => {
     throw new Error('Invalid or expired token');
   }
 };
+
+// check password strength
+common.checkPasswordStrength = async (password) => {
+  const result = zxcvbn(password);
+  return result;
+}
 
 module.exports = common;
