@@ -24,6 +24,15 @@ const initMigrations = async () => {
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     );
 
+    CREATE TABLE IF NOT EXISTS otp_codes (
+      id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+      user_id CHAR(36) NOT NULL,
+      otp_code VARCHAR(255) NOT NULL,
+      expires_at DATETIME NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
     CREATE TABLE IF NOT EXISTS investment_products (
       id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
       name VARCHAR(255) NOT NULL,

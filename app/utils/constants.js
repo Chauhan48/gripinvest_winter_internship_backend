@@ -10,6 +10,8 @@ const CONSTANTS = {
         ERROR: 'An unexpected error occured. Please try again later',
         UNAUTHORIZED: 'Unauthorized',
         PASSWORD_RESET_SUCCESS: 'Password reset successfully',
+        INVALID_OTP: 'Invalid OTP',
+        OTP_EXPIRED: 'Otp has expired. Kindly generate a new OTP',
     }
 };
 

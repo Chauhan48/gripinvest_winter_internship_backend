@@ -86,6 +86,17 @@ userController.forgotPassword = async (request, response) => {
         const resetToken = common.generateShortToken({ userId: rows[0].id });
 
         const otp = common.generateOTP();
+        const hashOtp = await common.hashOtp(otp);
+        const expiresDate = new Date(Date.now() + 10 * 60 * 1000);
+        const query = `INSERT INTO otp_codes (user_id, otp_code, expires_at)
+        VALUES (?, ?, ?)`;
+        const params = [
+            rows[0].id,
+            hashOtp,
+            expiresDate
+        ];
+        await dbServices.addRow(query, params);
+
         const htmlContent = await common.resetPasswordTemplate(rows[0].first_name, otp);
 
         await sendEmail({
@@ -106,8 +117,33 @@ userController.forgotPassword = async (request, response) => {
 
 userController.verifyPassword = async (request, response) => {
     try{
-        const { password_hash } = request.body;
+        const { otp, password_hash } = request.body;
         const user = request.user;
+        // check for otp;
+        const rows = await dbServices.find('SELECT * FROM otp_codes WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
+            [user.id]
+        );
+
+        if(rows.length === 0){
+            throw new Error();
+        }
+        
+        const checkOtp = await common.compareOtp(otp, rows[0].otp_code);
+        if(!checkOtp){
+            return response.status(401).json({ message: CONSTANTS.RESPONSE_MESSAGES.INVALID_OTP });
+        }
+        if(Date.now() > rows[0].expires_at)
+        {
+            return response.status(401).json({ message: CONSTANTS.RESPONSE_MESSAGES.OTP_EXPIRED });
+        }
+        const passwordStrenght = await common.checkPasswordStrength(password_hash);
+        if (passwordStrenght.score < 3) {
+            return response.status(400).json({
+                message: CONSTANTS.RESPONSE_MESSAGES.WEAK_PASSWORD,
+                suggestion: passwordStrenght.feedback.suggestions,
+                warning: passwordStrenght.feedback.warning
+            })
+        }
         const hashedPassword = await common.hashPassword(password_hash);
         const query = 'UPDATE users SET password_hash = ? WHERE email = ?';
         const params = [hashedPassword, user.email];

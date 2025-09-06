@@ -22,6 +22,15 @@ common.generateToken = (payload) => {
   return jwt.sign(payload, config.TOKEN_SECRET, { expiresIn: '24h' });
 };
 
+// hash OTP
+common.hashOtp = async (otp) => {
+    return await bcrypt.hash(otp.toString(), 10);
+}
+// compare plain otp with hashed otp
+common.compareOtp = async (plainOtp, hashedOtp) => {
+  return await bcrypt.compare(plainOtp.toString(), hashedOtp);
+};
+
 // generate short JWT token
 common.generateShortToken = (payload) => {
   return jwt.sign(payload, config.TOKEN_SECRET, { expiresIn: '10m' }); 
