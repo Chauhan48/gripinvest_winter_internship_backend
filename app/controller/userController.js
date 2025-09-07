@@ -124,7 +124,6 @@ userController.verifyOtp = async (request, response) => {
     try{
         const { otp } = request.body;
         const user = request.user;
-        console.log(request.user)
         // check for otp;
         const rows = await dbServices.execute('SELECT * FROM otp_codes WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
             [user.id]
@@ -157,6 +156,14 @@ userController.changePassword = async (request, response) => {
     try{
         const { password_hash } = request.body;
         const user = request.user;
+        const passwordStrenght = await common.checkPasswordStrength(password_hash);
+        if (passwordStrenght.score < 3) {
+            return response.status(400).json({
+                message: CONSTANTS.RESPONSE_MESSAGES.WEAK_PASSWORD,
+                suggestion: passwordStrenght.feedback.suggestions,
+                warning: passwordStrenght.feedback.warning
+            })
+        }
         const hashedPassword = await common.hashPassword(password_hash);
         const query = 'UPDATE users SET password_hash = ? WHERE email = ?';
         const params = [hashedPassword, user.email];

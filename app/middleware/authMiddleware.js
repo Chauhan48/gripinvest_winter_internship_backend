@@ -4,7 +4,11 @@ const CONSTANTS = require("../utils/constants");
 
 const authMiddleware = async (request, response, next) => {
     try{
-        const token = request.headers.authorization || request.cookies.auth_token;
+        let token = request.headers.authorization || request.cookies.auth_token;
+        if(request.headers.authorization && request.headers.authorization.startsWith("Bearer ")){
+            let temp = token.slice(7);
+            token = temp;
+        }
         const decoded = common.decryptToken(token);
         if(decoded && decoded.userId){
             const rows = await dbServices.execute('SELECT id, first_name, last_name, email, role, balance, risk_appetite FROM users WHERE id = ?', [decoded.userId]);
