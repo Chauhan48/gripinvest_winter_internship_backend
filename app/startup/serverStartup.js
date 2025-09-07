@@ -7,7 +7,10 @@ const investmentRoutes = require('../routes/investmentRoutes');
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(require('cors')());
+app.use(require('cors')({
+  origin: true,
+  credentials: true,
+}));
 app.use(require('cookie-parser')());
 app.use(logger);
 app.use('/user', userRoutes);

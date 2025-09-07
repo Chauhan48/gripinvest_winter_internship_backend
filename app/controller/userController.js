@@ -42,7 +42,9 @@ userController.signup = async (request, response) => {
         const token = common.generateToken({ userId: userId });
         response.cookie('auth_token', token, {
             httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000
+            maxAge: 24 * 60 * 60 * 1000,
+            sameSite: 'none',
+            secure: false
         });
 
         return response.status(200).json({ message: CONSTANTS.RESPONSE_MESSAGES.REGISTRATION_SUCCESS });
@@ -66,7 +68,9 @@ userController.login = async (request, response) => {
         const token = common.generateToken({ userId: rows[0].id });
         response.cookie('auth_token', token, {
             httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000
+            maxAge: 24 * 60 * 60 * 1000,
+            sameSite: 'lax',
+            secure: false 
         });
         return response.status(200).json({ message: CONSTANTS.RESPONSE_MESSAGES.LOGIN_SUCCESS });
 
@@ -158,9 +162,14 @@ userController.verifyPassword = async (request, response) => {
 
 userController.dashboard = async (request, response) => {
     const userData = request.user;
-    const rows = await dbServices.execute('SELECT id, user_id, product_id, amount, invested_at, status, expected_return, maturity_date FROM investments WHERE user_id = ?', [userData.id]);
+    // const investments = await dbServices.execute('SELECT id, user_id, product_id, amount, invested_at, status, expected_return, maturity_date FROM investments WHERE user_id = ?', [userData.id]);
+    const totalInvestment = await dbServices.execute('SELECT SUM(amount) AS sum FROM investments WHERE user_id = ?', [userData.id])
+    const totalProducts = await dbServices.execute('SELECT COUNT(*) AS total FROM investment_products')
     
-    return response.status(200).json({ data: userData, investments: rows });
+    return response.status(200).json({ data: userData, 
+        total_investment: totalInvestment[0].sum, 
+        total_products: totalProducts[0].total 
+    });
 }
 
 module.exports = userController;
