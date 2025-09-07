@@ -156,4 +156,11 @@ userController.verifyPassword = async (request, response) => {
 
 }
 
+userController.dashboard = async (request, response) => {
+    const userData = request.user;
+    const rows = await dbServices.execute('SELECT id, user_id, product_id, amount, invested_at, status, expected_return, maturity_date FROM investments WHERE user_id = ?', [userData.id]);
+    
+    return response.status(200).json({ data: userData, investments: rows });
+}
+
 module.exports = userController;

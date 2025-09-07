@@ -77,4 +77,11 @@ joiSchema.productListingSchema = {
     })
 }
 
+joiSchema.investSchema = {
+    body: joi.object({
+      productId: joi.string().required(),
+      amount: joi.number().positive().required()
+    })
+  }
+
 module.exports = joiSchema;

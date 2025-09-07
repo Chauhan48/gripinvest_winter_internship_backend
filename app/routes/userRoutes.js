@@ -13,4 +13,6 @@ userRoutes.post('/forgot-password', schemaValidation(joiSchema.forgotPasswordSch
 
 userRoutes.post('/verify-forgot-password', authMiddleware, schemaValidation(joiSchema.verifyPasswordSchema), userController.verifyPassword);
 
+userRoutes.get('/dashboard', authMiddleware, userController.dashboard);
+
 module.exports = userRoutes;

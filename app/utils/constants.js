@@ -15,6 +15,9 @@ const CONSTANTS = {
         PRODUCT_ADD_SUCCESS: 'New product added successfully',
         PRODUCT_DELETE_SUCCESS: 'Product deleted successfully',
         PRODUCT_UPDATE_SUCCESS: 'Product details updated successfully',
+        PRODUCT_NOT_FOUND: 'Product not found',
+        INSUFFICIENT_BALANCE: 'Insufficient balance',
+        INVESTMENT_SUCCESS: 'Investment successful'
     }
 };
 
