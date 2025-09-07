@@ -11,6 +11,7 @@ const CONSTANTS = {
         UNAUTHORIZED: 'Unauthorized',
         PASSWORD_RESET_SUCCESS: 'Password reset successfully',
         INVALID_OTP: 'Invalid OTP',
+        OTP_SUCCESS: 'Otp verified successfully',
         OTP_EXPIRED: 'Otp has expired. Kindly generate a new OTP',
         PRODUCT_ADD_SUCCESS: 'New product added successfully',
         PRODUCT_DELETE_SUCCESS: 'Product deleted successfully',

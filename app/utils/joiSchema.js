@@ -25,9 +25,14 @@ joiSchema.forgotPasswordSchema = {
     })
 }
 
-joiSchema.verifyPasswordSchema = {
+joiSchema.vefifyOtpSchema = {
     body: joi.object({
         otp: joi.number().min(6).required(),
+    })
+}
+
+joiSchema.verifyPasswordSchema = {
+    body: joi.object({
         password_hash: joi.string().min(6).required()
     })
 }

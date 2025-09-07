@@ -11,7 +11,9 @@ userRoutes.post('/login', schemaValidation(joiSchema.loginSchema), userControlle
 
 userRoutes.post('/forgot-password', schemaValidation(joiSchema.forgotPasswordSchema), userController.forgotPassword);
 
-userRoutes.post('/verify-forgot-password', authMiddleware, schemaValidation(joiSchema.verifyPasswordSchema), userController.verifyPassword);
+userRoutes.post('/verify-otp', authMiddleware, schemaValidation(joiSchema.vefifyOtpSchema), userController.verifyOtp);
+
+userRoutes.post('/change-password', authMiddleware, schemaValidation(joiSchema.verifyPasswordSchema), userController.changePassword);
 
 userRoutes.get('/dashboard', authMiddleware, userController.dashboard);
 

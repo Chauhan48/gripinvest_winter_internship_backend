@@ -84,12 +84,14 @@ userController.forgotPassword = async (request, response) => {
         const { email } = request.body;
         const rows = await dbServices.execute('SELECT * FROM users WHERE email = ?', [email]);
         if (rows.length == 0) {
-            throw new Error(CONSTANTS.RESPONSE_MESSAGES.INVALID_EMAIL);
+            return response.status(401).json({ message: CONSTANTS.RESPONSE_MESSAGES.INVALID_EMAIL });
         }
 
         const resetToken = common.generateShortToken({ userId: rows[0].id });
 
         const otp = common.generateOTP();
+        // for developmet purpose
+        console.log(otp)
         const hashOtp = await common.hashOtp(otp);
         const expiresDate = new Date(Date.now() + 10 * 60 * 1000);
         const query = `INSERT INTO otp_codes (user_id, otp_code, expires_at)
@@ -108,7 +110,6 @@ userController.forgotPassword = async (request, response) => {
             subject: 'Password Reset OTP',
             html: htmlContent
         })
-
         return response.status(200).json({
             message: CONSTANTS.RESPONSE_MESSAGES.FORGOT_PASSWORD_SUCCESS,
             token: resetToken
@@ -119,10 +120,11 @@ userController.forgotPassword = async (request, response) => {
     }
 }
 
-userController.verifyPassword = async (request, response) => {
+userController.verifyOtp = async (request, response) => {
     try{
-        const { otp, password_hash } = request.body;
+        const { otp } = request.body;
         const user = request.user;
+        console.log(request.user)
         // check for otp;
         const rows = await dbServices.execute('SELECT * FROM otp_codes WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
             [user.id]
@@ -133,6 +135,7 @@ userController.verifyPassword = async (request, response) => {
         }
         
         const checkOtp = await common.compareOtp(otp, rows[0].otp_code);
+
         if(!checkOtp){
             return response.status(401).json({ message: CONSTANTS.RESPONSE_MESSAGES.INVALID_OTP });
         }
@@ -140,24 +143,30 @@ userController.verifyPassword = async (request, response) => {
         {
             return response.status(401).json({ message: CONSTANTS.RESPONSE_MESSAGES.OTP_EXPIRED });
         }
-        const passwordStrenght = await common.checkPasswordStrength(password_hash);
-        if (passwordStrenght.score < 3) {
-            return response.status(400).json({
-                message: CONSTANTS.RESPONSE_MESSAGES.WEAK_PASSWORD,
-                suggestion: passwordStrenght.feedback.suggestions,
-                warning: passwordStrenght.feedback.warning
-            })
-        }
-        const hashedPassword = await common.hashPassword(password_hash);
-        const query = 'UPDATE users SET password_hash = ? WHERE email = ?';
-        const params = [hashedPassword, user.email];
-        await dbServices.execute(query, params);
-        return response.status(200).json({ message: CONSTANTS.RESPONSE_MESSAGES.PASSWORD_RESET_SUCCESS });
+        const resetToken = common.generateShortToken({ userId: user.id });
+
+        return response.status(200).json({ message: CONSTANTS.RESPONSE_MESSAGES.OTP_SUCCESS, token: resetToken });
     }catch(err){
         console.log(err);
         return response.status(401).json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR })
     }
 
+}
+
+userController.changePassword = async (request, response) => {
+    try{
+        const { password_hash } = request.body;
+        const user = request.user;
+        const hashedPassword = await common.hashPassword(password_hash);
+        const query = 'UPDATE users SET password_hash = ? WHERE email = ?';
+        const params = [hashedPassword, user.email];
+        await dbServices.execute(query, params);
+        return response.status(200).json({ message: CONSTANTS.RESPONSE_MESSAGES.PASSWORD_RESET_SUCCESS });
+
+    }catch(err){
+        console.log(err);
+        return response.status(401).json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR })
+    }
 }
 
 userController.dashboard = async (request, response) => {
