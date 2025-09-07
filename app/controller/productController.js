@@ -121,19 +121,39 @@ productController.productListing = async (request, response) => {
     const limit = parseInt(request.query.limit, 10) || 10;
     const offset = (page - 1) * limit;
 
-    const countQuery = `SELECT COUNT(*) as total FROM investment_products`;
-    const [countResult] = await dbServices.execute(countQuery);
+    let filterClauses = [];
+    let params = [];
+
+    if (request.query) {
+      if (request.query.risk_level) {
+        filterClauses.push('risk_level = ?');
+        params.push(request.query.risk_level);
+      }
+      if (request.query.investment_type) {
+        filterClauses.push('investment_type = ?');
+        params.push(request.query.investment_type);
+      }
+    }
+
+    const whereClause = filterClauses.length > 0 ? `WHERE ${filterClauses.join(' AND ')}` : '';
+
+    const countQuery = `SELECT COUNT(*) as total FROM investment_products ${whereClause}`;
+    const [countResult] = await dbServices.execute(countQuery, params);
     const total = countResult.total;
     const totalPages = Math.ceil(total / limit);
+
+    params.push(limit, offset);
 
     const query = `
       SELECT id, name, investment_type, tenure_months, annual_yield, risk_level,
              min_investment, max_investment, description, created_at, updated_at
       FROM investment_products
+      ${whereClause}
       ORDER BY created_at DESC
-      LIMIT ? OFFSET ?`;
+      LIMIT ? OFFSET ?
+    `;
 
-    const products = await dbServices.execute(query, [limit, offset]);
+    const products = await dbServices.execute(query, params);
 
     return response.status(200).json({
       page,
@@ -144,11 +164,8 @@ productController.productListing = async (request, response) => {
     });
   } catch (err) {
     console.error("Error fetching products:", err);
-    return response
-      .status(500)
-      .json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR });
+    return response.status(500).json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR });
   }
 };
-
 
 module.exports = productController;

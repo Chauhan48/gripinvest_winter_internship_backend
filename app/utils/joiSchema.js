@@ -78,7 +78,9 @@ joiSchema.updateProductSchema = {
 joiSchema.productListingSchema = {
     query: joi.object({
         page: joi.number().required(),
-        limit: joi.number().required()
+        limit: joi.number().required(),
+        investment_type: joi.string().valid('bond', 'fd', 'mf', 'etf', 'other').optional(),
+        risk_level: joi.string().valid('low', 'medium', 'high').optional()
     })
 }
 
