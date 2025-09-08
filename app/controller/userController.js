@@ -1,3 +1,4 @@
+const aiServices = require("../services/aiServices");
 const dbServices = require("../services/dbServices");
 const common = require("../utils/common");
 const CONSTANTS = require("../utils/constants");
@@ -186,6 +187,22 @@ userController.dashboard = async (request, response) => {
         total_investment: totalInvestment[0].sum, 
         total_products: totalProducts[0].total 
     });
+}
+
+userController.portfolioSummary = async (request, response) => {
+    try{
+        const user = request.user;
+        const investments = await dbServices.execute('SELECT * from investments WHERE user_id = ?', [user.id]);
+        const result = await aiServices.generatePortfolioSummary(investments);
+        const str = result.replace(/```json|```/g, "").trim();
+        const summary = JSON.parse(str);
+        console.log(summary.summary)
+        return response.status(200).json({summary});
+    }catch(error){
+        console.log(error);
+        return response.status(500).json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR });
+    }
+
 }
 
 module.exports = userController;

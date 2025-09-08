@@ -17,4 +17,6 @@ userRoutes.post('/change-password', authMiddleware, schemaValidation(joiSchema.v
 
 userRoutes.get('/dashboard', authMiddleware, userController.dashboard);
 
+userRoutes.get('/portfolio-summary', authMiddleware, userController.portfolioSummary);
+
 module.exports = userRoutes;
