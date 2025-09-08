@@ -53,7 +53,9 @@ investmentController.listInvestments = async (request, response) =>{
     try{
         const user = request.user;
         const investments = await dbServices.execute(`Select * FROM investments WHERE user_id = ?`, [user.id]);
-        return response.status(200).json({investments});
+        const investmentDistribution = await dbServices.execute(`SELECT status, SUM(amount) as total_amount FROM investments WHERE user_id = ? GROUP BY status`, [user.id]);
+        
+        return response.status(200).json({investments, investmentDistribution});
     } catch (err) {
         await connection.rollback();
         console.error(err);
