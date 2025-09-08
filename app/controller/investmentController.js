@@ -49,13 +49,52 @@ investmentController.invest = async (request, response) => {
     }
 }
 
-investmentController.listInvestments = async (request, response) =>{
-    try{
+investmentController.listInvestments = async (request, response) => {
+    try {
         const user = request.user;
-        const investments = await dbServices.execute(`Select * FROM investments WHERE user_id = ?`, [user.id]);
+        const investments = await dbServices.execute(
+  `SELECT i.id, ip.name AS product_name, i.status, i.user_id, i.product_id, i.amount, i.invested_at, i.expected_return, i.maturity_date
+   FROM investments i
+   JOIN investment_products ip ON i.product_id = ip.id
+   WHERE i.user_id = ?`,
+  [user.id]
+);
+
         const investmentDistribution = await dbServices.execute(`SELECT status, SUM(amount) as total_amount FROM investments WHERE user_id = ? GROUP BY status`, [user.id]);
-        
-        return response.status(200).json({investments, investmentDistribution});
+
+        const distributionChart = {
+            labels: investmentDistribution.map((row) => row.status),
+            datasets: [
+                {
+                    label: "Investment Distribution",
+                    data: investmentDistribution.map((row) => row.total_amount),
+                    backgroundColor: ["#36A2EB", "#4BC0C0", "#FF6384"],
+                },
+            ],
+        };
+
+        const investmentTrend = await dbServices.execute(
+            `SELECT DATE(invested_at) as invest_date, SUM(amount) as total_amount
+       FROM investments
+       WHERE user_id = ?
+       GROUP BY DATE(invested_at)
+       ORDER BY invest_date`,
+            [user.id]
+        );
+
+        const trendChart = {
+            labels: investmentTrend.map((row) => row.invest_date),
+            datasets: [
+                {
+                    label: "Investments Over Time",
+                    data: investmentTrend.map((row) => row.total_amount),
+                    borderColor: "#36A2EB",
+                    backgroundColor: "rgba(54, 162, 235, 0.2)",
+                },
+            ],
+        };
+
+        return response.status(200).json({ investments, distributionChart, trendChart });
     } catch (err) {
         await connection.rollback();
         console.error(err);
