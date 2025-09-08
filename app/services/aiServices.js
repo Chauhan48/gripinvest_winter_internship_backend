@@ -40,18 +40,25 @@ aiServices.suggestProducts = async (products = [], userRiskAppetite) => {
 
 The user will provide:  
 1. An array of investment products with details including:  
-   ${products}  
-2. The user's risk appetite: ${userRiskAppetite} (low, moderate, or high).  
+   ${JSON.stringify(products)}  
+2. The user's risk appetite: ${userRiskAppetite} (low, medium, or high).  
 
 Your tasks:  
 - From the provided products, select the one with the highest annual_yield that matches the user’s risk appetite.  
 - Return only that product's id and description.  
 - The description must be **concise (2–3 sentences max)**, highlight the product’s key benefits, tenure, and competitive yield, and explain why it suits the given risk appetite.  
 - The output must be in **valid JSON** format only, with no extra text.  
+- Note don't chage the key and value name.
 
 Format the response exactly as:  
 {
-  "product_id": "<id>",
+  "id": "<id of the producte from the above product list>",
+  "name": "<name of the product from the above product list>",
+  "investment_type": "<investment_type from the above product list>",
+  "tenure_monts": "<tenure_months from the above product list>",
+  "annual_yield": "<annual_yield from the above product list>",
+  "min_investment": <min_investment from the above product list>,
+  "max_investment": <max_investment from the above product list>,
   "description": "<short engaging paragraph here>"
 }
 
