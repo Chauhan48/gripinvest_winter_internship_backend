@@ -7,4 +7,6 @@ const investmentRoutes = require('express').Router();
 
 investmentRoutes.post('/investment', authMiddleware, schemaValidation(joiSchema.investSchema), investmentController.invest);
 
+investmentRoutes.get('/list-investments', authMiddleware, investmentController.listInvestments);
+
 module.exports = investmentRoutes;

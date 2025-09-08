@@ -49,4 +49,16 @@ investmentController.invest = async (request, response) => {
     }
 }
 
+investmentController.listInvestments = async (request, response) =>{
+    try{
+        const user = request.user;
+        const investments = await dbServices.execute(`Select * FROM investments WHERE user_id = ?`, [user.id]);
+        return response.status(200).json({investments});
+    } catch (err) {
+        await connection.rollback();
+        console.error(err);
+        return response.status(500).json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR });
+    }
+}
+
 module.exports = investmentController;

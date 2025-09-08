@@ -168,4 +168,19 @@ productController.productListing = async (request, response) => {
   }
 };
 
+productController.suggestProducts = async (request, response) => {
+  try{
+    const user = request.user;
+    const products = await dbServices.execute('SELECT id, name, investment_type, tenure_months, annual_yield, risk_level, min_investment, max_investment FROM investment_products');
+    const suggestedProducts = await aiServices.suggestProducts(products, user.risk_appetite);
+    const str = suggestedProducts.replace(/```json|```/g, "").trim();
+    const result = JSON.parse(str);
+    return response.status(200).json({products: result});
+  }catch(err){
+    console.error("Error fetching products:", err);
+    return response.status(500).json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR });
+  }
+
+}
+
 module.exports = productController;

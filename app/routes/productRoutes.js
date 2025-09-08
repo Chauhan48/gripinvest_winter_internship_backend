@@ -14,4 +14,6 @@ productRoutes.patch('/update-product', authMiddleware, checkForAdmin, schemaVali
 
 productRoutes.get('/list-products', authMiddleware, schemaValidation(joiSchema.productListingSchema), productController.productListing);
 
+productRoutes.get('/suggestions', authMiddleware, productController.suggestProducts);
+
 module.exports = productRoutes;
