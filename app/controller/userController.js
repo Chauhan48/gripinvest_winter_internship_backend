@@ -205,4 +205,20 @@ userController.portfolioSummary = async (request, response) => {
 
 }
 
+userController.logout = async (request, response) => {
+    try{
+        response.clearCookie('auth_token', {
+            httpOnly: true,
+            maxAge: 0,
+            sameSite: 'lax',
+            secure: false 
+        });
+        return response.status(200).json({ message: CONSTANTS.RESPONSE_MESSAGES.LOGOUT_SUCCESS })
+
+    }catch(error){
+        console.log(error);
+        return response.status(500).json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR });
+    }
+}
+
 module.exports = userController;

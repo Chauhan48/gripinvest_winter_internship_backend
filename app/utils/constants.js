@@ -18,7 +18,8 @@ const CONSTANTS = {
         PRODUCT_UPDATE_SUCCESS: 'Product details updated successfully',
         PRODUCT_NOT_FOUND: 'Product not found',
         INSUFFICIENT_BALANCE: 'Insufficient balance',
-        INVESTMENT_SUCCESS: 'Investment successful'
+        INVESTMENT_SUCCESS: 'Investment successful',
+        LOGOUT_SUCCESS: 'Logout successfully'
     }
 };
 

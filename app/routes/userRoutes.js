@@ -19,4 +19,6 @@ userRoutes.get('/dashboard', authMiddleware, userController.dashboard);
 
 userRoutes.get('/portfolio-summary', authMiddleware, userController.portfolioSummary);
 
+userRoutes.get('/logout', authMiddleware, userController.logout);
+
 module.exports = userRoutes;
