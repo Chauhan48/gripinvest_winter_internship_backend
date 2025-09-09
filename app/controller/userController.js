@@ -196,7 +196,6 @@ userController.portfolioSummary = async (request, response) => {
         const result = await aiServices.generatePortfolioSummary(investments);
         const str = result.replace(/```json|```/g, "").trim();
         const summary = JSON.parse(str);
-        console.log(summary.summary)
         return response.status(200).json({ summary });
     } catch (error) {
         console.log(error);

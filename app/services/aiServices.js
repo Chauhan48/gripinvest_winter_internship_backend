@@ -96,7 +96,9 @@ Your task:
 3. Mention the distribution of statuses (active vs matured vs cancelled).
 4. Highlight top 2 products by invested amount.
 5. Provide 2-3 insights about diversification and risks.
-6. Return the response in a JSON format with the following keys:
+6. Here is the array of investments:
+   ${JSON.stringify(investments)}
+7. Return the response in a JSON format with the following keys:
    {
      "summary": "...",
      "totals": {
@@ -114,9 +116,6 @@ Your task:
      "top_products": ["...", "..."],
      "insights": ["...", "..."]
    }
-
-Here is the array of investments:
-${JSON.stringify(investments)}
 `
     const result = await genAI.models.generateContent({
       model: 'gemini-2.5-flash',
