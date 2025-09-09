@@ -21,4 +21,6 @@ userRoutes.get('/portfolio-summary', authMiddleware, userController.portfolioSum
 
 userRoutes.get('/logout', authMiddleware, userController.logout);
 
+userRoutes.post('/update-profile', authMiddleware, schemaValidation(joiSchema.updateProfileSchema), userController.updateProfile);
+
 module.exports = userRoutes;

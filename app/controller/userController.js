@@ -71,7 +71,7 @@ userController.login = async (request, response) => {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000,
             sameSite: 'lax',
-            secure: false 
+            secure: false
         });
         return response.status(200).json({ message: CONSTANTS.RESPONSE_MESSAGES.LOGIN_SUCCESS });
 
@@ -122,7 +122,7 @@ userController.forgotPassword = async (request, response) => {
 }
 
 userController.verifyOtp = async (request, response) => {
-    try{
+    try {
         const { otp } = request.body;
         const user = request.user;
         // check for otp;
@@ -130,23 +130,22 @@ userController.verifyOtp = async (request, response) => {
             [user.id]
         );
 
-        if(rows.length === 0){
+        if (rows.length === 0) {
             throw new Error();
         }
-        
+
         const checkOtp = await common.compareOtp(otp, rows[0].otp_code);
 
-        if(!checkOtp){
+        if (!checkOtp) {
             return response.status(401).json({ message: CONSTANTS.RESPONSE_MESSAGES.INVALID_OTP });
         }
-        if(Date.now() > rows[0].expires_at)
-        {
+        if (Date.now() > rows[0].expires_at) {
             return response.status(401).json({ message: CONSTANTS.RESPONSE_MESSAGES.OTP_EXPIRED });
         }
         const resetToken = common.generateShortToken({ userId: user.id });
 
         return response.status(200).json({ message: CONSTANTS.RESPONSE_MESSAGES.OTP_SUCCESS, token: resetToken });
-    }catch(err){
+    } catch (err) {
         console.log(err);
         return response.status(401).json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR })
     }
@@ -154,7 +153,7 @@ userController.verifyOtp = async (request, response) => {
 }
 
 userController.changePassword = async (request, response) => {
-    try{
+    try {
         const { password_hash } = request.body;
         const user = request.user;
         const passwordStrenght = await common.checkPasswordStrength(password_hash);
@@ -171,7 +170,7 @@ userController.changePassword = async (request, response) => {
         await dbServices.execute(query, params);
         return response.status(200).json({ message: CONSTANTS.RESPONSE_MESSAGES.PASSWORD_RESET_SUCCESS });
 
-    }catch(err){
+    } catch (err) {
         console.log(err);
         return response.status(401).json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR })
     }
@@ -182,23 +181,24 @@ userController.dashboard = async (request, response) => {
     // const investments = await dbServices.execute('SELECT id, user_id, product_id, amount, invested_at, status, expected_return, maturity_date FROM investments WHERE user_id = ?', [userData.id]);
     const totalInvestment = await dbServices.execute('SELECT SUM(amount) AS sum FROM investments WHERE user_id = ?', [userData.id])
     const totalProducts = await dbServices.execute('SELECT COUNT(*) AS total FROM investment_products')
-    
-    return response.status(200).json({ data: userData, 
-        total_investment: totalInvestment[0].sum, 
-        total_products: totalProducts[0].total 
+
+    return response.status(200).json({
+        data: userData,
+        total_investment: totalInvestment[0].sum,
+        total_products: totalProducts[0].total
     });
 }
 
 userController.portfolioSummary = async (request, response) => {
-    try{
+    try {
         const user = request.user;
         const investments = await dbServices.execute('SELECT * from investments WHERE user_id = ?', [user.id]);
         const result = await aiServices.generatePortfolioSummary(investments);
         const str = result.replace(/```json|```/g, "").trim();
         const summary = JSON.parse(str);
         console.log(summary.summary)
-        return response.status(200).json({summary});
-    }catch(error){
+        return response.status(200).json({ summary });
+    } catch (error) {
         console.log(error);
         return response.status(500).json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR });
     }
@@ -206,19 +206,50 @@ userController.portfolioSummary = async (request, response) => {
 }
 
 userController.logout = async (request, response) => {
-    try{
+    try {
         response.clearCookie('auth_token', {
             httpOnly: true,
             maxAge: 0,
             sameSite: 'lax',
-            secure: false 
+            secure: false
         });
         return response.status(200).json({ message: CONSTANTS.RESPONSE_MESSAGES.LOGOUT_SUCCESS })
 
-    }catch(error){
+    } catch (error) {
         console.log(error);
         return response.status(500).json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR });
     }
 }
+
+userController.updateProfile = async (request, response) => {
+    try {
+        const user = request.user;
+        const { first_name, last_name, password, risk_appetite } = request.body;
+
+        const passwordStrenght = await common.checkPasswordStrength(password);
+        if (passwordStrenght.score < 3) {
+            return response.status(400).json({
+                message: CONSTANTS.RESPONSE_MESSAGES.WEAK_PASSWORD,
+                suggestion: passwordStrenght.feedback.suggestions,
+                warning: passwordStrenght.feedback.warning
+            })
+        }
+
+        const newPassword = await common.hashPassword(password);
+
+        await dbServices.execute(
+            `UPDATE users
+       SET first_name = ?, last_name = ?, password_hash = ?, risk_appetite = ?
+       WHERE id = ?`,
+            [first_name, last_name, newPassword, risk_appetite, user.id]
+        );
+
+        return response.status(200).json({ message: CONSTANTS.RESPONSE_MESSAGES.UPDATE_PROFILE_SUCCESS });
+    } catch (error) {
+        console.error(error);
+        return response.status(500).json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR });
+    }
+};
+
 
 module.exports = userController;

@@ -91,4 +91,13 @@ joiSchema.investSchema = {
     })
   }
 
+joiSchema.updateProfileSchema = {
+    body: joi.object({
+        first_name: joi.string().required(),
+        last_name: joi.string().required(),
+        password: joi.string().required(),
+        risk_appetite: joi.string().required()
+    })
+}
+
 module.exports = joiSchema;
