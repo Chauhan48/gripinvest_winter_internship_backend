@@ -12,7 +12,6 @@ const logger = async (request, response, next) => {
     try {
       if (!request.user) {
         if (request.cookies && request.cookies.auth_token) {
-          console.log(request.cookies.auth_token);
           const decode = common.decryptToken(request.cookies.auth_token);
           userId = decode.userId;
           const rows = await dbServices.execute('SELECT email FROM users WHERE id = ?', [userId]);
