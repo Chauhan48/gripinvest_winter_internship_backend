@@ -50,10 +50,20 @@ adminController.dashboard = async (request, response) => {
         );
 
         const mostSellingProducts = await dbServices.execute(
-            'SELECT product_id, SUM(amount) as totalInvestments FROM investments GROUP BY product_id ORDER BY totalInvestments DESC LIMIT 3'
+            `SELECT 
+     investments.product_id, 
+     IP.name, 
+     SUM(investments.amount) AS totalInvestments
+   FROM investments
+   LEFT JOIN investment_products IP 
+     ON investments.product_id = IP.id
+   GROUP BY investments.product_id, IP.name
+   ORDER BY totalInvestments DESC
+   LIMIT 3`
         );
 
-        return response.status(200).json({totalProducts, totalUsers, totalInvestments, mostSellingProducts})
+
+        return response.status(200).json({ totalProducts, totalUsers, totalInvestments, mostSellingProducts })
 
     } catch (error) {
         return response.status(500).json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR })
