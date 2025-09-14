@@ -100,4 +100,13 @@ joiSchema.updateProfileSchema = {
     })
 }
 
+joiSchema.transactionSchema = {
+    query: joi.object({
+        page: joi.number().required(),
+        limit: joi.number().required(),
+        user_id: joi.string().optional(),
+        email: joi.string().optional()
+    })
+}
+
 module.exports = joiSchema;
