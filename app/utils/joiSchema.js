@@ -60,6 +60,7 @@ joiSchema.deleteProductSchema = {
 
 joiSchema.updateProductSchema = {
     body: joi.object({
+        productId: joi.string().required(),
         name: joi.string().required(), 
         investment_type: joi.string().valid('bond', 'fd', 'mf', 'etf', 'other').required(), 
         tenure_months: joi.number().required(), 
