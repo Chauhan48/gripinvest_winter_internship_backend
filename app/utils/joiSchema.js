@@ -44,7 +44,7 @@ joiSchema.addProductSchema = {
         tenure_months: joi.number().required(), 
         annual_yield: joi.number().required(), 
         risk_level: joi.valid('low','moderate','high').required(), 
-        min_investment: joi.number().min(1000.00).precision(2).required(),
+        min_investment: joi.number().precision(2).required(),
         max_investment: joi.number().precision(2).required().when('min_investment', {
                 is: joi.number().required(),
                 then: joi.number().greater(joi.ref('min_investment')),
