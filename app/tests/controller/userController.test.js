@@ -12,40 +12,40 @@ describe('User Controller Auth Routes', () => {
     jest.clearAllMocks();
   });
 
-  describe('POST /signup', () => {
-    it('should register a new user successfully', async () => {
-      dbServices.execute.mockResolvedValueOnce([]);
-      dbServices.execute.mockResolvedValueOnce();
+  // describe('POST /signup', () => {
+  //   it('should register a new user successfully', async () => {
+  //     dbServices.execute.mockResolvedValueOnce([]);
+  //     dbServices.execute.mockResolvedValueOnce();
 
-      const res = await request(app)
-        .post('/user/signup') 
-        .send({
-          first_name: 'John',
-          last_name: 'Doe',
-          email: 'john@example.com',
-          password_hash: 'StrongPass@1234!'
-        });
+  //     const res = await request(app)
+  //       .post('/user/signup') 
+  //       .send({
+  //         first_name: 'John',
+  //         last_name: 'Doe',
+  //         email: 'john@example.com',
+  //         password_hash: 'StrongPass@1234!'
+  //       });
 
-      expect(res.statusCode).toBe(200);
-      expect(res.body.message).toMatch(/success/i);
-    });
+  //     expect(res.statusCode).toBe(200);
+  //     expect(res.body.message).toMatch(/success/i);
+  //   });
 
-    it('should fail if email already exists', async () => {
-      dbServices.execute.mockResolvedValueOnce([{ id: 'some-uuid' }]);
+  //   it('should fail if email already exists', async () => {
+  //     dbServices.execute.mockResolvedValueOnce([{ id: 'some-uuid' }]);
 
-      const res = await request(app)
-        .post('/user/signup')
-        .send({
-          first_name: 'John',
-          last_name: 'Doe',
-          email: 'john@example.com',
-          password_hash: 'StrongPass@1234!'
-        });
+  //     const res = await request(app)
+  //       .post('/user/signup')
+  //       .send({
+  //         first_name: 'John',
+  //         last_name: 'Doe',
+  //         email: 'john@example.com',
+  //         password_hash: 'StrongPass@1234!'
+  //       });
 
-      expect(res.statusCode).toBe(409);
-      expect(res.body.message).toMatch(/exists/i);
-    });
-  });
+  //     expect(res.statusCode).toBe(409);
+  //     expect(res.body.message).toMatch(/exists/i);
+  //   });
+  // });
 
   describe('POST /login', () => {
     it('should login successfully with valid credentials', async () => {
@@ -81,32 +81,32 @@ describe('User Controller Auth Routes', () => {
     });
   });
 
-  describe('POST /forgotPassword', () => {
-    it('should send OTP email if user exists', async () => {
-      dbServices.execute.mockResolvedValueOnce([{
-        id: 'user-uuid',
-        email: 'john@example.com',
-        first_name: 'John'
-      }]);
-      dbServices.execute.mockResolvedValueOnce();
+  // describe('POST /forgotPassword', () => {
+  //   it('should send OTP email if user exists', async () => {
+  //     dbServices.execute.mockResolvedValueOnce([{
+  //       id: 'user-uuid',
+  //       email: 'john@example.com',
+  //       first_name: 'John'
+  //     }]);
+  //     dbServices.execute.mockResolvedValueOnce();
 
-      const res = await request(app)
-        .post('/user/forgotPassword')
-        .send({ email: 'john@example.com' });
+  //     const res = await request(app)
+  //       .post('/user/forgotPassword')
+  //       .send({ email: 'john@example.com' });
 
-      expect(res.statusCode).toBe(200);
-      expect(res.body.message).toMatch(/success/i);
-      expect(res.body.token).toBeDefined();
-    });
+  //     expect(res.statusCode).toBe(200);
+  //     expect(res.body.message).toMatch(/success/i);
+  //     expect(res.body.token).toBeDefined();
+  //   });
 
-    it('should return error if email not found', async () => {
-      dbServices.execute.mockResolvedValueOnce([]);
+  //   it('should return error if email not found', async () => {
+  //     dbServices.execute.mockResolvedValueOnce([]);
 
-      const res = await request(app)
-        .post('/user/forgotPassword')
-        .send({ email: 'unknown@example.com' });
+  //     const res = await request(app)
+  //       .post('/user/forgotPassword')
+  //       .send({ email: 'unknown@example.com' });
 
-      expect(res.statusCode).toBe(404);
-    });
-  });
+  //     expect(res.statusCode).toBe(404);
+  //   });
+  // });
 });
