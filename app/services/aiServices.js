@@ -80,6 +80,43 @@ Now process the input.
 
 aiServices.generatePortfolioSummary = async (investments = []) => {
   try{
+//     const prompt = `You are a financial analyst AI. 
+// I will give you an array of investments made by a user. 
+// Each investment object has fields like: 
+// - product_name
+// - status (active/matured/cancelled)
+// - amount
+// - expected_return
+// - maturity_date
+// - invested_at
+
+// Your task:
+// 1. Summarize the portfolio in plain English (concise but informative).
+// 2. Calculate total invested amount, total expected returns, and highlight % allocation per product.
+// 3. Mention the distribution of statuses (active vs matured vs cancelled).
+// 4. Highlight top 2 products by invested amount.
+// 5. Provide 2-3 insights about diversification and risks.
+// 6. Here is the array of investments:
+//    ${JSON.stringify(investments)}
+// 7. Return the response in a JSON format with the following keys:
+//    {
+//      "summary": "...",
+//      "totals": {
+//        "total_invested": ...,
+//        "total_expected_return": ...
+//      },
+//      "allocation": [
+//        { "product_name": "...", "percentage": ... }
+//      ],
+//      "status_distribution": {
+//        "active": ...,
+//        "matured": ...,
+//        "cancelled": ...
+//      },
+//      "top_products": ["...", "..."],
+//      "insights": ["...", "..."]
+//    }
+// `
     const prompt = `You are a financial analyst AI. 
 I will give you an array of investments made by a user. 
 Each investment object has fields like: 
@@ -98,6 +135,7 @@ Your task:
 5. Provide 2-3 insights about diversification and risks.
 6. Here is the array of investments:
    ${JSON.stringify(investments)}
+
 7. Return the response in a JSON format with the following keys:
    {
      "summary": "...",
