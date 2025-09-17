@@ -1,3 +1,10 @@
+// Mock auth-related middlewares to bypass JWT and admin checks
+jest.mock('../../middleware/authMiddleware', () => jest.fn((req, _res, next) => {
+  req.user = { id: 'admin-uuid', role: 'admin' };
+  next();
+}));
+jest.mock('../../middleware/checkForAdmin', () => jest.fn((_req, _res, next) => next()));
+
 const app = require('../../startup/serverStartup');
 const request = require('supertest');
 const dbServices = require('../../services/dbServices');

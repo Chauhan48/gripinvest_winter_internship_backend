@@ -1,11 +1,11 @@
-const productController = require('../../controllers/productController');
+jest.mock('../../services/dbServices');
+jest.mock('../../services/aiServices');
+
+const productController = require('../../controller/productController');
 const dbServices = require('../../services/dbServices');
 const aiServices = require('../../services/aiServices');
 const CONSTANTS = require('../../utils/constants');
 const httpMocks = require('node-mocks-http');
-
-jest.mock('../../services/dbServices');
-jest.mock('../../services/aiServices');
 
 describe('Product Controller', () => {
   beforeEach(() => {

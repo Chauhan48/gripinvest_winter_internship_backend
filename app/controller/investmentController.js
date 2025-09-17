@@ -96,7 +96,6 @@ investmentController.listInvestments = async (request, response) => {
 
         return response.status(200).json({ investments, distributionChart, trendChart });
     } catch (err) {
-        await connection.rollback();
         console.error(err);
         return response.status(500).json({ message: CONSTANTS.RESPONSE_MESSAGES.ERROR });
     }

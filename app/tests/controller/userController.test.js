@@ -1,3 +1,8 @@
+// Mock auth middleware to bypass JWT during tests
+jest.mock('../../middleware/authMiddleware', () => jest.fn((req, _res, next) => {
+  req.user = { id: 'user-uuid', email: 'john@example.com', balance: 1000, risk_appetite: 'moderate' };
+  next();
+}));
 
 const app = require('../../startup/serverStartup');
 const request = require('supertest');

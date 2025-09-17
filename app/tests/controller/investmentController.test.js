@@ -1,11 +1,11 @@
-const investmentController = require('../../controllers/investmentController');
+jest.mock('../../services/dbServices');
+jest.mock('mysql2/promise');
+
+const investmentController = require('../../controller/investmentController');
 const dbServices = require('../../services/dbServices');
 const mysql = require('mysql2/promise');
 const CONSTANTS = require('../../utils/constants');
 const httpMocks = require('node-mocks-http');
-
-jest.mock('../../services/dbServices');
-jest.mock('mysql2/promise');
 
 describe('Investment Controller', () => {
   let mockConnection;
