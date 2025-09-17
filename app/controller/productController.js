@@ -81,8 +81,7 @@ productController.updateProduct = async (request, response) => {
         annual_yield = ?, 
         risk_level = ?, 
         min_investment = ?, 
-        max_investment = ?, 
-        description = ?,
+        max_investment = ?,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?`;
 
@@ -94,7 +93,6 @@ productController.updateProduct = async (request, response) => {
             risk_level,
             min_investment,
             max_investment,
-            description,
             productId
         ];
 
