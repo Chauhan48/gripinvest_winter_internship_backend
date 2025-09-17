@@ -1,9 +1,11 @@
 
-const app = require('../startup/serverStartup');
+const app = require('../../startup/serverStartup');
 const request = require('supertest');
-const dbServices = require('../services/dbServices');
+const dbServices = require('../../services/dbServices');
 
-jest.mock('../services/dbServices');
+jest.mock('../../services/dbServices', () => ({
+  execute: jest.fn(),
+}));
 
 describe('User Controller Auth Routes', () => {
   afterEach(() => {
@@ -12,16 +14,16 @@ describe('User Controller Auth Routes', () => {
 
   describe('POST /signup', () => {
     it('should register a new user successfully', async () => {
-      dbServices.find.mockResolvedValueOnce([]);
-      dbServices.addRow.mockResolvedValueOnce();
+      dbServices.execute.mockResolvedValueOnce([]);
+      dbServices.execute.mockResolvedValueOnce();
 
       const res = await request(app)
-        .post('/user/signup')   // Include the /user prefix
+        .post('/user/signup') 
         .send({
           first_name: 'John',
           last_name: 'Doe',
           email: 'john@example.com',
-          password_hash: 'StrongPass123!'
+          password_hash: 'StrongPass@1234!'
         });
 
       expect(res.statusCode).toBe(200);
@@ -29,7 +31,7 @@ describe('User Controller Auth Routes', () => {
     });
 
     it('should fail if email already exists', async () => {
-      dbServices.find.mockResolvedValueOnce([{ id: 'some-uuid' }]);
+      dbServices.execute.mockResolvedValueOnce([{ id: 'some-uuid' }]);
 
       const res = await request(app)
         .post('/user/signup')
@@ -37,7 +39,7 @@ describe('User Controller Auth Routes', () => {
           first_name: 'John',
           last_name: 'Doe',
           email: 'john@example.com',
-          password_hash: 'StrongPass123!'
+          password_hash: 'StrongPass@1234!'
         });
 
       expect(res.statusCode).toBe(409);
@@ -47,10 +49,10 @@ describe('User Controller Auth Routes', () => {
 
   describe('POST /login', () => {
     it('should login successfully with valid credentials', async () => {
-      dbServices.find.mockResolvedValueOnce([{
+      dbServices.execute.mockResolvedValueOnce([{
         id: 'user-uuid',
         email: 'john@example.com',
-        password_hash: await require('../utils/common').hashPassword('StrongPass123!')
+        password_hash: await require('../../utils/common').hashPassword('StrongPass123!')
       }]);
 
       const res = await request(app)
@@ -65,7 +67,7 @@ describe('User Controller Auth Routes', () => {
     });
 
     it('should fail login with invalid credentials', async () => {
-      dbServices.find.mockResolvedValueOnce([]);
+      dbServices.execute.mockResolvedValueOnce([]);
 
       const res = await request(app)
         .post('/user/login')
@@ -81,12 +83,12 @@ describe('User Controller Auth Routes', () => {
 
   describe('POST /forgotPassword', () => {
     it('should send OTP email if user exists', async () => {
-      dbServices.find.mockResolvedValueOnce([{
+      dbServices.execute.mockResolvedValueOnce([{
         id: 'user-uuid',
         email: 'john@example.com',
         first_name: 'John'
       }]);
-      dbServices.addRow.mockResolvedValueOnce();
+      dbServices.execute.mockResolvedValueOnce();
 
       const res = await request(app)
         .post('/user/forgotPassword')
@@ -98,13 +100,13 @@ describe('User Controller Auth Routes', () => {
     });
 
     it('should return error if email not found', async () => {
-      dbServices.find.mockResolvedValueOnce([]);
+      dbServices.execute.mockResolvedValueOnce([]);
 
       const res = await request(app)
         .post('/user/forgotPassword')
         .send({ email: 'unknown@example.com' });
 
-      expect(res.statusCode).toBe(401);
+      expect(res.statusCode).toBe(404);
     });
   });
 });
