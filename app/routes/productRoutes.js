@@ -8,7 +8,7 @@ const joiSchema = require('../utils/joiSchema');
 
 productRoutes.post('/add-product', authMiddleware, checkForAdmin, schemaValidation(joiSchema.addProductSchema), productController.addProduct);
 
-productRoutes.delete('/delete-product', authMiddleware, checkForAdmin, schemaValidation(joiSchema.deleteProductSchema), productController.removeProduct);
+productRoutes.delete('/delete-product/:productId', authMiddleware, checkForAdmin, schemaValidation(joiSchema.deleteProductSchema), productController.removeProduct);
 
 productRoutes.patch('/update-product', authMiddleware, checkForAdmin, schemaValidation(joiSchema.updateProductSchema), productController.updateProduct);
 

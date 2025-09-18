@@ -17,7 +17,9 @@
   "scripts": {
     "test": "jest",
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "docker:build": "docker build -t gripinvest_backend .",
+    "docker:run": "docker run -p 8080:3000 gripinvest_backend"
   },
   "jest": {
     "testEnvironment": "node"

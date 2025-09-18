@@ -42,7 +42,7 @@ productController.addProduct = async (request, response) => {
 
 productController.removeProduct = async (request, response) => {
     try {
-        const { productId } = request.body;
+        const { productId } = request.params;
         const query = `
                 DELETE from investment_products WHERE id = ?`;
         const params = [productId];
@@ -56,8 +56,9 @@ productController.removeProduct = async (request, response) => {
 
 productController.updateProduct = async (request, response) => {
     try {
+      console.log(request.body);
         const {
-            productId,
+            id,
             name,
             investment_type,
             tenure_months,
@@ -68,7 +69,7 @@ productController.updateProduct = async (request, response) => {
             description
         } = request.body;
 
-        if (!productId) {
+        if (!id) {
             return response.status(400).json({ message: "Product ID is required" });
         }
 
@@ -93,7 +94,7 @@ productController.updateProduct = async (request, response) => {
             risk_level,
             min_investment,
             max_investment,
-            productId
+            id
         ];
 
         const result = await dbServices.execute(query, params);

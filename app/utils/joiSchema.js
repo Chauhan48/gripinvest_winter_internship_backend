@@ -53,7 +53,7 @@ joiSchema.addProductSchema = {
 }
 
 joiSchema.deleteProductSchema = {
-    body: joi.object({
+    params: joi.object({
         productId: joi.string().required()
     })
 }
@@ -70,7 +70,7 @@ joiSchema.updateProductSchema = {
                 is: joi.number().required(),
                 then: joi.number().greater(joi.ref('min_investment')),
             }),
-        productId: joi.string().required(),
+        id: joi.string().required(),
     })
 }
 

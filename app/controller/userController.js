@@ -44,7 +44,7 @@ userController.signup = async (request, response) => {
         response.cookie('auth_token', token, {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000,
-            sameSite: 'none',
+            sameSite: 'lax',
             secure: false
         });
 
@@ -64,6 +64,7 @@ userController.login = async (request, response) => {
         }
         const password = await common.comparePassword(password_hash, rows[0].password_hash);
         if (!password) {
+            console.log(password);
             throw new Error(CONSTANTS.RESPONSE_MESSAGES.INVALID_CREDENTIALS);
         }
         const token = common.generateToken({ userId: rows[0].id });
