@@ -194,6 +194,9 @@ userController.portfolioSummary = async (request, response) => {
     try {
         const user = request.user;
         const investments = await dbServices.execute('SELECT * from investments WHERE user_id = ?', [user.id]);
+        if (!investments || investments.length === 0) {
+            return response.status(200).json({ message: "No investments yet." });
+        }
         const result = await aiServices.generatePortfolioSummary(investments);
         const str = result.replace(/```json|```/g, "").trim();
         const summary = JSON.parse(str);

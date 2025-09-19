@@ -5,14 +5,24 @@ const productRoutes = require('../routes/productRoutes');
 const investmentRoutes = require('../routes/investmentRoutes');
 const dbServices = require('../services/dbServices');
 const adminRoutes = require('../routes/adminRoutes');
+const cors = require('cors');
 const transactionRoutes = require('../routes/transactionRoutes');
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(require('cors')({
-  origin: true,
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:4040',
+    'http://grip-invest-frontend:5173',  // Docker internal network
+    'http://grip-invest-admin-pannel:4040', // Docker internal network
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:4040'
+  ],
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
 }));
 app.use(require('cookie-parser')());
 app.use(logger);
